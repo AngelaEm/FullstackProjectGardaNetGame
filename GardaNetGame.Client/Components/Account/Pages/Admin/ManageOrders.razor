@@ -1,0 +1,120 @@
+﻿@page "/Administrate/Orders"
+@using GardaNetGame.Shared.DTOs.Orders.Responses
+@using GardaNetGame.Shared.DTOs.Events.Response
+@using GardaNetGame.Shared.DTOs.Games.Response
+@using GardaNetGame.Shared.Interfaces
+@rendermode InteractiveServer
+@inject IOrderService<OrdersResponse> OrderService
+@inject IEventService<EventsResponse> EventService
+@inject IGameService<GameResponse> GameService
+
+
+<h3>Hanter Ordrar</h3>
+
+<div>
+    <label class="form-label">Välj Order:</label>
+    <select id="EventChoiceDropdown" class="form-control" value="@currentOrder" @onchange="@OnEventSelected">
+        <option value="addNew"></option>
+        @foreach (var order in Orders)
+        {
+            <option value="@order.Id">@order.Id</option>
+        }
+    </select>
+</div>
+
+<EditForm Model="@currentOrder" OnValidSubmit="@OnValidSubmit" FormName="EducationForm">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group pb-2">
+	    <label class="form-label" for="EventTypes">Välj eventtyp:</label>
+	    <select class="form-select" required id="EventTypeSelector" @bind="SelectedEvent.Id">
+		    <option selected value="">Välj typ</option>
+		    @foreach (var eventToSelect in Events)
+		    {
+			    <option value="@eventToSelect.Id">@eventToSelect.Name</option>
+		    }
+	    </select>
+    </div>
+    
+    <div class="form-group pb-2">
+	    <label class="form-label" for="EventTypes">Välj event:</label>
+	    <select class="form-select" required id="EventTypeSelector" @bind="SelectedGame.Id">
+		    <option selected value="">Välj typ</option>
+		    @foreach (var game in Games)
+		    {
+			    <option value="@game.Id">@game.Name</option>  
+		    }
+	    </select>
+    </div>
+
+
+    <button id="submiteventbutton" type="submit" class="btn btn-success">Uppdatera/Lägg till</button>
+    <button id="deleteeventbutton" type="button" class="btn btn-danger" @onclick="@OnDelete">Ta bort</button>
+
+</EditForm>
+
+@code {
+
+    private OrdersResponse currentOrder = new();
+
+    private List<OrdersResponse> Orders = new();
+    private List<EventsResponse> Events = new();
+    private List<GameResponse> Games = new();
+
+    private OrdersResponse SelectedOrder = new();
+    private GameResponse SelectedGame = new();
+    private EventsResponse SelectedEvent = new();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        Orders.AddRange(await OrderService.GetAllOrders());
+        Events.AddRange(await EventService.GetAllEvents());
+        Games.AddRange(await GameService.GetAllGames());
+    }
+
+    private async Task OnValidSubmit()
+    {
+
+        if (currentOrder.Id == Guid.Empty)
+        {
+            await OrderService.AddOrder(currentOrder);
+        }
+        else
+        {
+            await OrderService.UpdateOrder(currentOrder);
+        }
+
+        Orders.Clear();
+        Orders.AddRange(await OrderService.GetAllOrders());
+        currentOrder = new OrdersResponse();
+    }
+
+    private async Task OnDelete()
+    {
+        if (currentOrder != null && currentOrder.Id != Guid.Empty)
+        {
+            await OrderService.RemoveOrder(currentOrder);
+        }
+
+        Orders.Clear();
+        Orders.AddRange(await OrderService.GetAllOrders());
+        currentOrder = new OrdersResponse();
+    }
+
+    private async Task OnEventSelected(ChangeEventArgs e)
+    {
+        Guid.TryParse(e.Value?.ToString(), out Guid eventId);
+
+        if (eventId == Guid.Empty)
+        {
+            currentOrder = new OrdersResponse();
+            
+        }
+        else
+        {
+            currentOrder = Orders.FirstOrDefault(e => e.Id == eventId);
+        }
+    }
+}

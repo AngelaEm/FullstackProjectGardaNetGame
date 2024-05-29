@@ -1,0 +1,18 @@
+﻿@inherits LayoutComponentBase
+@layout AccountLayout
+
+<Main class="mx-3 mt-2">
+    <h1>Hantera ditt konto</h1>
+    <div>
+        <h2>Ändra kontoinställningar</h2>
+        <hr />
+        <div class="row">
+            <div class="col-md-3">
+                <ManageNavMenu />
+            </div>
+            <div class="col-md-9">
+                @Body
+            </div>
+        </div>
+    </div>
+</Main>

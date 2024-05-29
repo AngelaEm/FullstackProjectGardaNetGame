@@ -1,0 +1,67 @@
+﻿@page "/checkout/{Id:guid}"
+@using GardaNetGame.Shared.DTOs.Events.Response
+@using GardaNetGame.Shared.DTOs.Games.Response
+@using GardaNetGame.Shared.Interfaces
+@inject IEventService<EventsResponse> EventService
+@inject IGameService<GameResponse> GameService
+@inject IJSRuntime JSRuntime
+@rendermode InteractiveServer
+<div class="ms-3 mt-3">
+    <h3>Kassan</h3>
+    <div>
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <h3>Dina Varor</h3>
+                    <ul>
+                        @if(currentEvent is not null )
+						{
+							<li>@currentEvent.Name</li>
+							<li>@currentEvent.Price</li>
+						}
+                        @if (currentGame is not null)
+                        {
+	                        <li>@currentGame.Name</li>
+	                        <li>@currentGame.Price</li>
+                        }
+	                    
+                    </ul>
+                    <h3>Välj din betallösning</h3>
+                    <button class="btn btn-warning mt-2"  id="KlarnaButton" @onclick=LoadKlarnaSnippetAsync>
+                        Klarna Checkout
+                    </button>
+                </div>
+                <div class="col">
+                    <div id="klarna-checkout-container">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    window.renderSnippet = function (htmlSnippet) 
+    {
+        var checkoutContainer = document.getElementById('klarna-checkout-container');
+        checkoutContainer.innerHTML = htmlSnippet;
+        var scriptTags = checkoutContainer.getElementsByTagName('script');
+        Array.from(scriptTags).forEach(oldScript => 
+            {
+                const newScript = document.createElement('script');
+                newScript.text = oldScript.text;
+                oldScript.parentNode.replaceChild(newScript, oldScript);
+            });
+    }   
+</script>
+@code {
+	private EventsResponse currentEvent = new();
+    private GameResponse currentGame = new();
+   
+	
+	[Parameter]
+	public Guid Id { get; set; }
+
+	
+
+}

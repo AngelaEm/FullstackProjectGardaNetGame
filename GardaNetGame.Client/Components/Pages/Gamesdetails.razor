@@ -1,0 +1,89 @@
+﻿@page "/gamedetails/{GameId:guid}"
+@rendermode InteractiveServer
+@inject IGameService<GameResponse> GameService
+@inject NavigationManager NavigationManager
+@using GardaNetGame.Shared.DTOs.Games.Response
+@using GardaNetGame.Shared.Interfaces
+@using GardaNetGame.Client.Services
+@* @inject BlobStorageService BlobStorageService *@
+
+
+
+@if (currentGame != null)
+{
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8 text-center">
+                <img src="@currentGame.ProductImageUrl" alt="Spelbild" class="img-fluid mb-3" style="max-width: 50%; height: auto;" />
+                <h5>@currentGame.Name</h5>
+                @if (currentGame.Genre != null)
+                {
+                    <p><strong>Genrer:</strong></p>
+                    
+                    @foreach (var genre in currentGame.Genre)
+                    {
+                            <p>@genre.Name</p>
+                    }
+
+                }
+                <P><stong>Pris:</stong> @currentGame.Price</P>
+                <div class="pb-2">
+                    <button id="buy_Games" class="btn btn-warning" @onclick="@(() => NavigateToCheckout(currentGame.Id))">Köp Nu!</button>
+
+                </div>
+
+                @if (currentGame.VideoTrailer != null){
+
+                    <iframe width="650" height="351" src="@currentGame.VideoTrailer" title="Official Minecraft Trailer" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                }
+                
+                <p><strong>Utgivningsdatum:</strong> @currentGame.PublicationDate.ToString("yyyy-MM-dd")</p>
+                <p><strong>Studio:</strong> @currentGame.GameDeveloper</p>
+                <p><strong>Utgivare:</strong @currentGame.Publisher></p>
+                <p><strong>Beskriving:</strong> @currentGame.Description</p>
+                <p><strong>Åldersgräns:</strong> @currentGame.AgeRestriction</p>
+                <p><strong>Multiplayerläge:</strong> @currentGame.NumberOfPlayers</p>
+                <p><strong>Platform:</strong> @currentGame.Platform</p>
+                <p><strong>Systemkrav:</strong> @currentGame.SystemRequirement</p>
+                <p><strong>Onlineläge:</strong> @currentGame.OnlineFuntionality</p>
+                
+
+            </div>
+        </div>
+    </div>
+
+}
+else
+{
+    <div class="alert alert-warning" role="alert">
+        Spelet kunde inte hittas.
+    </div>
+}
+
+
+@code {
+    [Parameter]
+    public Guid GameId { get; set; }
+
+    private GameResponse currentGame = new();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        currentGame = await GameService.GetGameById(GameId);
+
+
+        // if (currentGame != null && !string.IsNullOrEmpty(currentGame.ProductImageUrl))
+        // {
+        //     var sasUrl = BlobStorageService.GenerateBlobSasUrl(currentGame.ProductImageUrl);
+        //     currentGame.ProductImageUrl = sasUrl;
+        // }
+
+    }
+
+    private void NavigateToCheckout(Guid gameId)
+    {
+	    NavigationManager.NavigateTo($"/checkout/{gameId}");
+    }
+}

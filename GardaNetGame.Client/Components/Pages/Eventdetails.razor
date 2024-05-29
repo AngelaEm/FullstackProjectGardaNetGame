@@ -1,0 +1,100 @@
+﻿@* @inject BlobStorageService BlobStorageService *@
+@page "/eventdetails/{EventId:guid}"
+@rendermode InteractiveServer
+
+@using GardaNetGame.Shared.DTOs.Events.Response
+@using GardaNetGame.Shared.Interfaces
+@using GardaNetGame.Client.Services
+@using GardaNetGame.Shared.DTOs.Orders.Responses
+@using System.Text
+
+@inject NavigationManager NavigationManager
+
+@inject IEventService<EventsResponse> EventService
+@inject IOrderService<OrdersResponse> OrderService
+
+
+@if (currentEvent != null)
+{
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8 text-center">
+                @if (!currentEvent.IsUpcoming)
+                {
+                    <p><h4 style="color: #FE0404">Detta event har tyvärr redan varit.</h4></p>
+                }
+                <img src="@currentEvent.EventImageUrl" alt="Eventbild" class="img-fluid mb-3" style="max-width: 50%; height: auto;" />
+                <h5>@currentEvent.Name</h5>
+
+                <p><strong>Datum:</strong> @currentEvent.Date.ToString("yyyy-MM-dd HH:mm")</p>
+                <p><strong>Plats:</strong> @currentEvent.Location</p>
+                <p><strong>Beskrivning:</strong> @currentEvent.Description</p>
+                <p><strong>Åldersbegränsning: @currentEvent.AgeRestriction år</strong></p>
+                <p><strong>Pris:</strong> @currentEvent.Price kr</p>
+                <p><strong>Kapacitet:</strong> @currentEvent.Capacity</p>
+                <p><strong>Varaktighet:</strong> @currentEvent.Duration h</p>
+                @if (currentEvent.IsUpcoming)
+                {
+                    <button id="buy_event" class="btn btn-warning" @onclick="@(() => NavigateToCheckout(currentEvent.Id))">Köp Nu!</button>
+                }
+            </div>
+        </div>
+    </div>
+
+}
+else
+{
+    <div class="alert alert-warning" role="alert">
+        Eventet kunde inte hittas.
+    </div>
+}
+
+
+@code {
+    [Parameter]
+    public Guid EventId { get; set; }
+    private EventsResponse currentEvent = new();
+    private OrdersResponse currentOrder;
+
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        currentEvent = await EventService.GetEventById(EventId);
+
+        // if (currentEvent != null && !string.IsNullOrEmpty(currentEvent.EventImageUrl))
+        // {
+        //     var sasUrl = BlobStorageService.GenerateBlobSasUrl(currentEvent.EventImageUrl);
+        //     currentEvent.EventImageUrl = sasUrl;
+        // }
+    }
+
+    private async Task BuyMethod()
+    {
+        var content = new StringContent("{}", Encoding.UTF8, "application/json");
+
+        if (currentOrder is null)
+        {
+            currentOrder = await OrderService.AddOrder(new OrdersResponse());
+            await OrderService.AddEventToOrder(currentOrder.Id, EventId, content);
+            Console.WriteLine("inne i if");
+        }
+        // if order is not active
+
+        else
+        {
+            await OrderService.AddEventToOrder(currentOrder.Id, EventId, content);
+            Console.WriteLine("inne i else");
+        }
+
+        
+    }
+
+    private async Task NavigateToCheckout(Guid currentEventId)
+    {
+        NavigationManager.NavigateTo($"/checkout/{currentEventId}");
+    }
+
+}0

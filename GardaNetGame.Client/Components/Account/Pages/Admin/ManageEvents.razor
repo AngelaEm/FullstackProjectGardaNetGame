@@ -1,0 +1,206 @@
+﻿@page "/Admin/Events"
+@using GardaNetGame.Shared.Interfaces
+@using GardaNetGame.Shared.DTOs.Events.Response
+@using GardaNetGame.Shared.DTOs.EventTypes.Response
+@using GardaNetGame.Client.Services
+@rendermode InteractiveServer
+@inject IEventService<EventsResponse> EventService
+@inject IEventTypeService<EventTypesResponse> EventTypeService
+@* @inject BlobStorageService BlobStorageService
+ *@
+<Main>
+<h1>Hantera Event</h1>
+<div class="pb-2" >
+    <label class="form-label ">Välj Event:</label>
+    <select id="EventChoiceDropdown" class="form-control" value="@currentEvent" @onchange="@OnEventSelected">
+        <option value="addNew"></option>
+        @foreach (var eventItem in Events)
+        {
+            <option value="@eventItem.Id">@eventItem.Name</option>
+        }
+    </select>
+</div>
+<EditForm Model="@currentEvent" OnValidSubmit="@OnValidSubmit" FormName="EducationForm" >
+    <DataAnnotationsValidator />
+    <div class="form-group pb-2">
+        <label class="form-label" for="EventTypes">Välj eventtyp:</label>
+        <select class="form-select" required id="EventTypeSelector" @bind="SelectedEventType.Id">
+            <option selected value="">Välj typ</option>
+            @foreach (var eventType in EventTypes)
+            {
+                <option value="@eventType.Id">@eventType.Type</option>
+            }
+        </select>
+    </div>
+    <div class="form-group pb-2">
+        <label for="Name">Namn på Event:</label>
+        <InputText id="Name" class="form-control" @bind-Value="currentEvent.Name" />
+    </div>
+    <div class="form-group pb-2">
+        <label for="Date">Tid och datum:</label>
+        <InputDate Type="InputDateType.DateTimeLocal" id="Date" class="form-control" @bind-Value="DateTimeVariable" />
+    </div>
+    <div class="form-group pb-2">
+        <label for="Location">Plats:</label>
+        <InputText id="Location" class="form-control" @bind-Value="currentEvent.Location" />
+    </div>
+    <div class="form-group pb-2">
+        <label for="IsUpcoming">På gång:</label>
+        <input type="checkbox" id="isUpcoming" class="form-check-input" @bind="currentEvent.IsUpcoming" />
+    </div>
+    <div class="form-group pb-2">
+        <label for="Description">Beskrivning:</label>
+        <InputTextArea id="description" class="form-control" @bind-Value="currentEvent.Description" />
+    </div>
+    <div class="form-group pb-2">
+        <label for="AgeRestriction">Åldersgräns:</label>
+        <InputNumber id="AgeRestriction" class="form-control" @bind-Value="currentEvent.AgeRestriction" />
+    </div>
+    <div class="form-group pb-2">
+	    <label for="eventImageUrl">Eventbild:</label>
+	    <InputFile OnChange="@UploadFile" class="form-control" />
+    </div>
+    <div class="form-group pb-2">
+	    @* 	    <a id="getAzureImages" @onclick="OpenImagePicker" class="btn">Välj från Befintliga bilder</a>
+ *@	    
+	    @if (Blobs.Any())
+	    {
+		    <select id="selectAzureImages" @onchange="HandleSelection" class="form-control">
+			    <option>Välj från befintliga bilder</option>
+			    @foreach (var blob in Blobs)
+			    {
+				    <option value="@blob">@blob</option>
+			    }
+		    </select>
+	    }
+    </div>
+    @* <div class="form-group">
+        <label for="BackgroundImageUrl">Bakgrundsbild:</label>
+        <InputText id="backgroundImageUrl" class="form-control" @bind-Value="currentEvent.BackgroundImageUrl" />
+    </div> 
+    Denna propertyn används inte i dagsläget. Kan användas till exempelvis spelbild. *@
+    <div class="form-group pb-2">
+        <label for="Duration">Varaktighet:</label>
+        <InputNumber id="duration" class="form-control" @bind-Value="currentEvent.Duration" />
+    </div>
+    <div class="form-group pb-2">
+        <label for="Capacity">Max antal deltagare:</label>
+        <InputNumber id="capacity" class="form-control" @bind-Value="currentEvent.Capacity" />
+    </div>
+    <div class="form-group pb-2">
+        <label for="Price">Pris:</label>
+        <InputNumber id="price" class="form-control" @bind-Value="currentEvent.Price" />
+    </div>
+    <ValidationSummary />
+    <div>
+        <button id="submiteventbutton" type="submit" class="btn btn-success pb-2">Uppdatera/Lägg till</button>
+        <button id="deleteeventbutton" type="button" class="btn btn-danger" @onclick="@OnDelete">Ta bort</button>
+    </div>
+</EditForm>
+</Main>
+
+@code {
+	private EventsResponse currentEvent = new();
+	private List<EventsResponse> Events = new();
+    private EventTypesResponse SelectedEventType = new();
+    private List<EventTypesResponse> EventTypes = new();
+    private DateTime DateTimeVariable = DateTime.Now;
+    private List<string> Blobs = new();
+    
+    protected override async Task OnInitializedAsync()
+    {
+        Events.AddRange(await EventService.GetAllEvents());
+        EventTypes.AddRange(await EventTypeService.GetAllEventTypes());
+        // Blobs = BlobStorageService.GetBlobNames();
+    }
+
+    private async Task OnValidSubmit()
+    {
+        SelectedEventType = EventTypes.FirstOrDefault(e => e.Id == SelectedEventType.Id);
+        currentEvent.EventType = SelectedEventType;
+        currentEvent.Date = DateTimeVariable;
+        if (currentEvent.Id == Guid.Empty)
+        {
+            await EventService.AddEvent(currentEvent);
+        }
+        else
+        {
+            await EventService.UpdateEvent(currentEvent);
+        }
+        Events.Clear();
+        Events.AddRange(await EventService.GetAllEvents());
+        currentEvent = new EventsResponse();
+    }
+
+    private async Task OnDelete()
+    {
+        if (currentEvent != null && currentEvent.Id != Guid.Empty)
+        {
+            await EventService.RemoveEvent(currentEvent);
+        }
+        Events.Clear();
+        Events.AddRange(await EventService.GetAllEvents());
+        currentEvent = new EventsResponse();
+    }
+
+    private async Task OnEventSelected(ChangeEventArgs e)
+    {
+        Guid.TryParse(e.Value?.ToString(), out Guid eventId);
+        if (eventId == Guid.Empty)
+        {
+            currentEvent = new EventsResponse();
+            SelectedEventType = new();
+            DateTimeVariable = DateTime.Now;
+        }
+        else
+        {
+            currentEvent = Events.FirstOrDefault(e => e.Id == eventId);
+            SelectedEventType = currentEvent.EventType;
+            DateTimeVariable = currentEvent.Date;
+        }
+    }
+
+    private async Task UploadFile(InputFileChangeEventArgs e)
+    {
+	    var file = e.File;
+	    if (file != null)
+	    {
+		    long maxFileSize = 500 * 1024; // 500kB
+		    if (file.Size > maxFileSize)
+		    {
+			    Console.WriteLine("Filen är för stor. Maximal tillåten storlek är 500kB.");
+			    return;
+		    }
+		    try
+		    {
+			    currentEvent.EventImageUrl = file.Name;
+			    // using (var stream = file.OpenReadStream(maxFileSize))
+			    // {
+				   //  await BlobStorageService.UploadFromStreamAsync(file.Name, stream);
+			    // }
+		    }
+		    catch (Exception ex)
+		    {
+			    Console.WriteLine($"Ett fel uppstod vid uppladdning av filen: {ex.Message}");
+		    }
+	    }
+    }
+
+    void HandleSelection(ChangeEventArgs e)
+    {
+	    var selectedBlob = e.Value.ToString();
+	    if (selectedBlob != "Välj från befintliga bilder")
+	    {
+		    SelectExistingBlob(selectedBlob).ConfigureAwait(false);
+	    }
+    }
+
+    private async Task SelectExistingBlob(string blob)
+    {
+	    if (!string.IsNullOrEmpty(blob))
+	    {
+            currentEvent.EventImageUrl = blob;
+	    }
+    }
+}
+

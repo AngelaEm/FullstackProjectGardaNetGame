@@ -1,0 +1,52 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34616.47
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Frontend", "Frontend", "{47C56D67-EEA6-4AAC-929B-35401466090A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Backend", "Backend", "{68C4F83E-E5D4-4842-892B-E51B5A16F2CF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GardaNetGame.Shared", "GardaNetGame.Shared\GardaNetGame.Shared.csproj", "{654077F8-AF7A-4015-91C1-C3ECD044FDA1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GardaNetGame.API", "GardaNetGame.API\GardaNetGame.API.csproj", "{1DA3ED9E-20F6-4730-BEDD-02CE29F0A209}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GardaNetGame.Client", "GardaNetGame.Client\GardaNetGame.Client.csproj", "{509B2E67-8F76-416F-8A53-C33C6BEFA877}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GardaNetGame.DataAccess", "GardaNetGame.DataAccess\GardaNetGame.DataAccess.csproj", "{485C2FE8-C721-4314-BCC6-FFDE1836E8C9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{654077F8-AF7A-4015-91C1-C3ECD044FDA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{654077F8-AF7A-4015-91C1-C3ECD044FDA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{654077F8-AF7A-4015-91C1-C3ECD044FDA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{654077F8-AF7A-4015-91C1-C3ECD044FDA1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1DA3ED9E-20F6-4730-BEDD-02CE29F0A209}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1DA3ED9E-20F6-4730-BEDD-02CE29F0A209}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1DA3ED9E-20F6-4730-BEDD-02CE29F0A209}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1DA3ED9E-20F6-4730-BEDD-02CE29F0A209}.Release|Any CPU.Build.0 = Release|Any CPU
+		{509B2E67-8F76-416F-8A53-C33C6BEFA877}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{509B2E67-8F76-416F-8A53-C33C6BEFA877}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{509B2E67-8F76-416F-8A53-C33C6BEFA877}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{509B2E67-8F76-416F-8A53-C33C6BEFA877}.Release|Any CPU.Build.0 = Release|Any CPU
+		{485C2FE8-C721-4314-BCC6-FFDE1836E8C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{485C2FE8-C721-4314-BCC6-FFDE1836E8C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{485C2FE8-C721-4314-BCC6-FFDE1836E8C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{485C2FE8-C721-4314-BCC6-FFDE1836E8C9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1DA3ED9E-20F6-4730-BEDD-02CE29F0A209} = {68C4F83E-E5D4-4842-892B-E51B5A16F2CF}
+		{509B2E67-8F76-416F-8A53-C33C6BEFA877} = {47C56D67-EEA6-4AAC-929B-35401466090A}
+		{485C2FE8-C721-4314-BCC6-FFDE1836E8C9} = {68C4F83E-E5D4-4842-892B-E51B5A16F2CF}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DE16BEC8-453E-4782-86EC-77CB165268D1}
+	EndGlobalSection
+EndGlobal

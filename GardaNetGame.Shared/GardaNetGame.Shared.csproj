@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+   <Folder Include="DTOs\Customer\Response\" />
+   <Folder Include="DTOs\Customer\Request\" />
+   <Folder Include="Interfaces\" />
+
+    <Folder Include="DTOs\Games\Request\" />
+
+    <Folder Include="DTOs\Genres\Response\" />
+    <Folder Include="DTOs\Orders\Responses\" />
+  </ItemGroup>
+
+</Project>

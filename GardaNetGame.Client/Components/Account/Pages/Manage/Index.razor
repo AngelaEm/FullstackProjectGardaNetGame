@@ -1,0 +1,105 @@
+﻿@page "/Account/Manage"
+
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Identity
+@using GardaNetGame.Client.Data
+
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
+@inject IdentityUserAccessor UserAccessor
+@inject IdentityRedirectManager RedirectManager
+
+<PageTitle>Profile</PageTitle>
+
+<h3>Profil</h3>
+<StatusMessage />
+
+<div class="row">
+    <div class="col-md-6">
+        <EditForm Model="Input" FormName="profile" OnValidSubmit="OnValidSubmitAsync" method="post">
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert" />
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="Input.FullName" class="form-control" placeholder="Vänligen skriv in ditt fullständiga namn." />
+                <label for="full-name" class="form-label">Fullständigt namn</label>
+                <ValidationMessage For="() => Input.FullName" class="text-danger" />
+            </div>
+            <div class="form-floating mb-3">
+                <InputDate @bind-Value="Input.DateOfBirth" class="form-control" placeholder="Vänligen skriv in ditt födelsedatum." />
+                <label for="date-of-birth" class="form-label">Födelsedatum</label>
+                <ValidationMessage For="() => Input.DateOfBirth" class="text-danger" />
+            </div>
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="Input.Address" class="form-control" placeholder="Vänligen skriv in din adress." />
+                <label for="address" class="form-label">Adress</label>
+                <ValidationMessage For="() => Input.Address" class="text-danger" />
+            </div>
+
+            <div class="form-floating mb-3">
+                <input type="text" value="@username" class="form-control" placeholder="Vänligen välj användarnamn." disabled />
+                <label for="username" class="form-label">Användarnamn</label>
+            </div>
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="Input.PhoneNumber" class="form-control" placeholder="Vänligen skriv in ditt telefonnummer." />
+                <label for="phone-number" class="form-label">Telefonnummer</label>
+                <ValidationMessage For="() => Input.PhoneNumber" class="text-danger" />
+            </div>
+            <button type="submit" class="w-100 btn btn-lg btn-primary">Spara</button>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private ApplicationUser user = default!;
+    private string? username;
+    private string? phoneNumber;
+
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
+
+    [SupplyParameterFromForm]
+    private InputModel Input { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = await UserAccessor.GetRequiredUserAsync(HttpContext);
+        username = await UserManager.GetUserNameAsync(user);
+        phoneNumber = await UserManager.GetPhoneNumberAsync(user);
+
+        Input.PhoneNumber ??= phoneNumber;
+        Input.DateOfBirth ??= user.DateOfBirth;
+        Input.FullName ??= user.FullName;
+        Input.Address ??= user.Address;
+
+    }
+
+    private async Task OnValidSubmitAsync()
+    {
+        user.FullName = Input.FullName;
+        user.Address = Input.Address;
+        user.DateOfBirth = Input.DateOfBirth;
+
+        var updateResult = await UserManager.UpdateAsync(user);
+
+        var setPhoneResult = await UserManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
+        if (!updateResult.Succeeded)
+        {
+            RedirectManager.RedirectToCurrentPageWithStatus("Error: Failed to update user.", HttpContext);
+        }
+        
+
+        await SignInManager.RefreshSignInAsync(user);
+        RedirectManager.RedirectToCurrentPageWithStatus("Your profile has been updated", HttpContext);
+    }
+
+    private sealed class InputModel
+    {
+        public string? FullName { get; set; }
+        public string? Address { get; set; }
+        public DateOnly? DateOfBirth { get; set; }
+        [Phone]
+        [Display(Name = "Phone number")]
+        public string? PhoneNumber { get; set; }
+
+    }
+}

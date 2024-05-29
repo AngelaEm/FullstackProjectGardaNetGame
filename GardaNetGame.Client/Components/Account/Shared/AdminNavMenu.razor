@@ -1,0 +1,29 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using GardaNetGame.Client.Data
+
+<ul class="nav nav-pills flex-column">
+
+    <AuthorizeView Roles="admin">
+        <Authorized>
+            <li class="nav-item">
+                <NavLink id="manageEventTab" class="nav-link" href="/Admin/Events" Match="NavLinkMatch.All">Hantera Event</NavLink>
+            </li>
+            <li class="nav-item">
+                <NavLink id="manageEventTypeTab" class="nav-link" href="/Admin/EventType">Hantera Eventtyper</NavLink>
+            </li>
+            <li class="nav-item">
+                <NavLink id="manageGameTab" class="nav-link" href="/Admin/Games">Hantera Spel</NavLink>
+            </li>
+            <li class="nav-item">
+                <NavLink id="manageGenresTab" class="nav-link" href="/Admin/Genres">Hantera Spelgenrer</NavLink>
+            </li>
+            @*<li class="nav-item">
+                <NavLink id="manageOrderTab" class="nav-link" href="/Administrate/Orders">Ordrar</NavLink>
+            </li>*@
+        </Authorized>
+    </AuthorizeView>
+</ul>
+
+@code {
+
+}

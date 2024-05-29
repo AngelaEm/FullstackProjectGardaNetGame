@@ -1,0 +1,74 @@
+﻿@page "/games"
+
+@rendermode InteractiveServer
+@using GardaNetGame.Shared.DTOs.Games.Response
+@using GardaNetGame.Client.Services
+@using GardaNetGame.Shared.Interfaces
+@inject NavigationManager NavigationManager
+@inject IGameService<GameResponse> GameService
+@* @inject BlobStorageService BlobStorageService *@
+
+
+<div id="gameView" class="pt-3">
+    <h1 id="storePageTitle" class="text-center pb-2">Produkter</h1>
+</div>
+
+<div class="container">
+    <div class="row">
+        @for (var i = 0; i < ListOfGames.Count(); i++)
+        {
+            var aGame = ListOfGames[i];
+            var idNumber = i + 1;
+            <div id="card.@idNumber" @onclick="@(() => NavigateToGameDetails(aGame.Id))" data-bs-theme="dark" class="px-2 pb-3 col-md-4 col-sm-6 col-lg-3" style="cursor: pointer;">
+                <div class="card text-center" style="min-height: 30rem;">
+                    <div class="card-header">
+                        <img src="@aGame.ProductImageUrl" @onclick="@(() => NavigateToGameDetails(aGame.Id))" class="img-fluid mb-3" style="cursor: pointer; max-width: 50%; height: 200px;" alt="Bild Saknas" />
+                    </div>
+                    <div id="cardbody.@idNumber" class="card-body">
+                        <h5 id="cardtitle.@idNumber" class="card-title">@aGame.Name</h5>
+                        <div id="cardplatformlist.@idNumber">
+                            @foreach (var p in aGame.Genre)
+                            {
+                                <p class="card-text">@p.Name</p>
+                            }
+                        </div>
+                        <p class="card-text">@aGame.Platform</p>
+                        <p class="card-text">@aGame.Price kr</p>
+
+                        
+                    </div>
+                    <div class="card-footer text-body-secondary">
+                        <a id="gamecardbutton.@idNumber" @onclick="@(() => NavigateToGameDetails(aGame.Id))" class="btn btn-warning card-shadow" style="border: 2px solid #FE0404; background-color: #383F46; color: #FBFBFA">Mer information</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    List<GameResponse> ListOfGames = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        ListOfGames.AddRange(await GameService.GetAllGames());
+
+        foreach (var game in ListOfGames)
+        {
+            //if(game != null && !string.IsNullOrEmpty(game.ProductImageUrl))
+			// {
+			// 	var sasUrl = BlobStorageService.GenerateBlobSasUrl(game.ProductImageUrl);
+			// 	game.ProductImageUrl = sasUrl;
+			// }
+        }
+
+        ListOfGames = ListOfGames.OrderByDescending(response => response.Name).ToList();
+    }
+
+    private void NavigateToGameDetails(Guid gameId)
+    {
+        NavigationManager.NavigateTo($"/gamedetails/{gameId}");
+    }
+
+
+}

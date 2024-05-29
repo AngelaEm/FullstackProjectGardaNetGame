@@ -1,0 +1,59 @@
+﻿@page "/Footer"
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<footer class="text-center text-lg-start mt-3">
+	<div class="container p-4">
+        <div class="row">
+
+            @* Kolumn 1 *@
+            <div class="pt-3 col-lg-4 col-md-12 mb-4 mb-md-0 text-center">
+                <h5 class="pt-2 pb-4 text-uppercase">Kontaktuppgifter</h5>
+                <p>
+                    Adress: Gårdagatan 123<br>
+                    412 50 Göteborg<br>
+                    E-post: kund@iths.se<br>
+                    Telefon: 031-412 50 51<br/><br/>
+                    Öppettider: Mån-Fre 08:00-17:00
+                </p>
+            </div>
+            
+            @* Kolumn 2 *@
+            <div class="col-lg-4 col-md-12 mb-4 mb-md-0 text-center">
+                    <div class="pb-2">
+                    <a href="/faq" class="btn btn-lg active card-shadow" id="faqButton" style="border: 2px solid #FE0404; color: #FE0404" role="button" aria-pressed="true">FAQ</a>
+                    </div>
+                    <div class="pb-2">
+                    <a href="/omOss" class="btn btn-lg active card-shadow" id="aboutUsButton" style="border: 2px solid #FE0404; color: #FE0404" role="button" aria-pressed="true">Om Oss</a>
+                    </div>
+                    <div class="pb-2">
+                    <a href="mailto:kund@iths.se" class="btn btn-lg active card-shadow" id="emailButton" style="border: 2px solid #FE0404; color: #FE0404" aria-pressed="true">Kontakta oss</a>
+                    </div>
+                    <div class="pb-3">
+                    <a href="https://www.facebook.com/" class="btn btn-lg active card-shadow" target="_blank" rel="noreferrer noopener" id="facebookButton" style="border: 2px solid #FE0404; color: #FE0404" role="button" aria-pressed="true">Följ oss på Facebook</a>
+                    </div>
+         
+            </div>
+            
+            @* Kolumn 3 *@
+            <div class="col-lg-4 col-md-12 mb-4 mb-md-0 mt-4 text-center">
+                <h5 class="text-uppercase">Hitta till oss</h5>
+                <div class="map-container" id="mapView">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d8526.644841051488!2d11.993378!3d57.7052255!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x464ff38213b82625%3A0x407820810ec82744!2zR8OlcmRhLCBHw7Z0ZWJvcmc!5e0!3m2!1ssv!2sse!4v1712831081955!5m2!1ssv!2sse" width="300" height="150" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
+            </div>
+
+        </div>
+	</div>
+
+    <div class="text-center p-3" style="background-color: #121310">
+		© 2024 Gårda NetGame
+	</div>
+</footer>
+
+
+
+
+@code {
+	
+}

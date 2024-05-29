@@ -1,0 +1,96 @@
+﻿@page "/Admin/EventType"
+@using GardaNetGame.Shared.Interfaces
+
+@using GardaNetGame.Shared.DTOs.EventTypes.Response
+@rendermode InteractiveServer
+
+@inject IEventTypeService<EventTypesResponse> EventTypeService
+
+
+<h3 id="mangageEventTypeHeader">Hantera eventtyper.</h3>
+
+<div class="pb-2">
+    <label class="form-label">Välj ett event typ:</label>
+    <select class="form-control" id="eventTypeNamn" value="@SelectedEventType" @onchange="@OnEventTypeSelected">
+        <option value="chooseEvent"></option>
+        @foreach (var eventTypeItem in EventTypes)
+        {
+            <option value="@eventTypeItem.Id">@eventTypeItem.Type</option>
+        }
+    </select>
+</div>
+<EditForm Model="@SelectedEventType" OnValidSubmit="@OnValidSubmit" FormName="EducationForm">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group pb-3">
+        <label for="Type">Namn på event typ:</label>
+        <InputText id="eventTypeType" maxlength="30" class="form-control" @bind-Value="@SelectedEventType.Type" />
+    </div>
+
+
+    <button type="submit" id="eventTypeSubmitButton" class="btn btn-success">Uppdatera/Lägg till</button>
+    <button type="button" id="eventTypeSumbitButton" class="btn btn-danger" @onclick="@OnDelete">Ta bort</button>
+
+</EditForm>
+@code {
+
+
+    private EventTypesResponse SelectedEventType = new();
+    private List<EventTypesResponse> EventTypes = new();
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        EventTypes.AddRange(await EventTypeService.GetAllEventTypes());
+        EventTypes = EventTypes.OrderBy(e => e.Type).ToList();
+
+    }
+
+    private async Task OnValidSubmit()
+    {
+
+        if (SelectedEventType.Id == Guid.Empty)
+        {
+            await EventTypeService.AddEventType(SelectedEventType);
+        }
+        else
+        {
+            await EventTypeService.UpdateEventType(SelectedEventType);
+        }
+
+        EventTypes.Clear();
+        EventTypes.AddRange(await EventTypeService.GetAllEventTypes());
+        EventTypes = EventTypes.OrderBy(e => e.Type).ToList();
+        SelectedEventType = new EventTypesResponse();
+    }
+
+    private async Task OnDelete()
+    {
+        if (SelectedEventType != null && SelectedEventType.Id != Guid.Empty)
+        {
+            await EventTypeService.RemoveEventType(SelectedEventType);
+        }
+
+        EventTypes.Clear();
+        EventTypes.AddRange(await EventTypeService.GetAllEventTypes());
+        EventTypes = EventTypes.OrderBy(e => e.Type).ToList();
+        SelectedEventType = new EventTypesResponse();
+    }
+
+    private async Task OnEventTypeSelected(ChangeEventArgs e)
+    {
+        Guid.TryParse(e.Value?.ToString(), out Guid eventTypeId);
+
+        if (eventTypeId == Guid.Empty)
+        {
+            SelectedEventType = new EventTypesResponse();
+        }
+        else
+        {
+            SelectedEventType = EventTypes.FirstOrDefault(e => e.Id == eventTypeId);
+        }
+    }
+
+}

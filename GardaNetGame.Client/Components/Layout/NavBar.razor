@@ -1,0 +1,119 @@
+﻿@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+<nav class="navbar navbar-expand-lg navbar-background">
+	<div class="container-fluid">
+		<a class="navbar-brand" href="#">
+            <img id="navlogo" src="https://teamgardastorage.blob.core.windows.net/gardanetgameimages/retrologga.webp" class="round-logo" alt=" logga" width="40" height="40">
+		</a>
+		<button id="hamburgermenu" class="navbar-toggler " type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+		</button>
+        <div class="collapse navbar-collapse bg-dark" id="navbarSupportedContent" data-bs-theme="dark">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+	            <li class="nav-item">
+		            <a id="hometab" class="nav-link" aria-current="page" href="#">Hem</a>
+	            </li>
+                <li class="nav-item">
+                    <a id="eventtab" class="nav-link" href="event">Event</a>
+                </li>
+	            <li class="nav-item">
+		            <a id="gametab" class="nav-link" href="games">Butik</a>
+	            </li>
+	            <li class="nav-item">
+		            <a id="aboutus" class="nav-link" aria-current="page" href="omOss">Om oss</a>
+	            </li>
+            </ul>
+            
+            <div class="d-flex align-items-center">
+                <ul class=" navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item dropdown">
+                        <AuthorizeView Roles="admin">
+                            <Authorized>
+                                <a class="nav-link dropdown-toggle" id="dropdownMenuButton" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Admin
+                                </a>
+                            </Authorized>
+                            <NotAuthorized>
+                                <AuthorizeView>
+                                    <Authorized Context="context_unauthView">
+                                        <a class="nav-link dropdown-toggle" id="dropdownMenuButton" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            Konto
+                                        </a>
+                                    </Authorized>
+                                </AuthorizeView>
+                            </NotAuthorized>
+                        </AuthorizeView>
+
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <AuthorizeView Roles="admin">
+                                <Authorized>
+                                    <NavLink id="ManageWebsiteTab" class="dropdown-item" href="/Admin/Events">Administrera hemsida</NavLink>
+                                </Authorized>
+                            </AuthorizeView>
+                            <AuthorizeView>
+                                <Authorized>
+                                    <li><NavLink id="manageaccounttab" class="dropdown-item" href="/Account/Manage">Hantera konto</NavLink></li>
+                                    <li>
+                                        <form action="Account/Logout" method="post" class="">
+                                            <AntiforgeryToken />
+                                            <input type="hidden" name="ReturnUrl" value="@currentUrl" />
+                                            <button id="logouttab" type="submit" class="dropdown-item">
+                                                Logga ut
+                                            </button>
+                                        </form>
+                                    </li>
+                                </Authorized>
+                            </AuthorizeView>
+                        </ul>
+                    </li>
+                    <AuthorizeView>
+                        <NotAuthorized>
+                            <NavLink id="logintab" class="nav-link " href="/Account/Login">Logga in</NavLink>
+                            
+                            @* Går att göra en "split button dropdown" här för att välja att logga in eller registrera sig *@
+                            @* <NavLink id="registertab" class="nav-link " href="/Account/Register">Registrera</NavLink> *@
+                        </NotAuthorized>
+                    </AuthorizeView>
+                </ul>
+                <button id="kundkorgsButton" class="px-4 btn nav-link" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvas" role="button">
+                    @* <span>Kundkorg</span> *@
+                    <i class="bi bi-cart2"></i>
+                    <span class="badge nav-link">@cartItemCount</span>
+                </button>
+            </div>
+                
+			@* <form class="d-flex" role="search">
+					<input id="searchinput" class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+					<button id="searchsubmitbutton" class="btn btn-outline-success" type="submit">Search</button>
+				</form> *@
+		</div>
+	</div>
+</nav>
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvas" aria-labelledby="offcanvasLabel">
+	<div class="offcanvas-header">
+		<h5 class="offcanvas-title" id="offcanvasLabel">Kundkorg</h5>
+		<button type="button" id="CartCloseButton" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+	</div>
+	<div class="offcanvas-body">
+        <div class="card mb-3" style="max-width: 540px;">
+            <div class="row g-0">
+                <div class="col-md-4">
+                    <img src="https://teamgardastorage.blob.core.windows.net/gardanetgameimages/kundkorg.webp" class="img-fluid rounded-start" alt="GameImg">
+					
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <h5 id="CardTitle" class="card-title">Spel</h5>
+                        <p id="cardText" class="card-text">Antal: X</p>
+                        <p id="CardPrice" class="card-text">Pris: Y kr</p>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <button id="CheckoutButton" class="btn btn-warning" @onclick=NavigateToCheckout>Gå till kassan</button>
+            </div>
+        </div>
+
+	</div>
+</div>
+                

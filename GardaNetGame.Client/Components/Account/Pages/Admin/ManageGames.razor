@@ -1,0 +1,217 @@
+﻿@page "/Admin/Games"
+@using GardaNetGame.Shared.Interfaces
+@using GardaNetGame.Shared.DTOs.Games.Response
+@using GardaNetGame.Shared.DTOs.Genres.Response
+@using GardaNetGame.Client.Services
+@rendermode InteractiveServer
+@inject IGameService<GameResponse> GameService
+@inject IGenreService<GenresResponse> GenresService
+@* @inject BlobStorageService BlobStorageService *@
+
+
+<h3>Hantera Spel</h3>
+
+<div class="pb-2">
+    <label class="form-label">Välj Spel:</label>
+    <select id="GameChoiceDropdown" class="form-control" value="@currentGame" @onchange="@OnGameSelected">
+        <option value="addNew"></option>
+        @foreach (var gameItem in Game)
+        {
+            <option value="@gameItem.Id">@gameItem.Name</option>
+        }
+    </select>
+</div>
+
+<EditForm Model="@currentGame" OnValidSubmit="@OnValidSubmit" FormName="EducationForm">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group pb-2">
+        <label for="Name">Title på spel:</label>
+        <InputText id="Name" class="form-control" @bind-Value="currentGame.Name" />
+    </div>
+    @* ---------------------------- *@
+    <div class="form-group pb-2">
+        <label class="form-label" for="Genre">Välj genre:</label>
+        <select class="form-select" required id="GenreSelector" @bind="SelectedGenresType.Id">
+            <option selected value="">Välj typ</option>
+            @foreach (var gameType in GenreTypes)
+            {
+                <option value="@gameType.Id">@gameType.Name</option>
+            }
+        </select>
+        <div class="pb-2">
+            <a id="AddGenreToGame" @onclick="AddGenreToGame" class="btn btn-success mt-2">Lägg till genre till spel</a>
+            <a id="RemoveGenreToGame" @onclick="RemoveGenreToGame" class="btn btn-danger mt-2">Ta bort genre från spel</a>
+        </div>
+    </div>
+    <div class="pb-2">
+        <label>Valda genrer:</label>
+        
+            @if (currentGame.Genre != null)
+            {
+                <ul>
+                @foreach (var genre in currentGame.Genre)
+                {
+                    <li>@genre.Name</li>
+                }
+                </ul>
+            }
+    </div> 
+    @* ---------------------------- *@
+    <div class="form-group pb-2">
+        <label for="PublicationDate">Utgivningsdatum:</label>
+        <InputDate id="PublicationDate" class="form-control" @bind-Value="DateTimeVariable" />
+    </div>
+    <div class="form-group pb-2">
+        <label for="GameDeveloper">Studio:</label>
+        <InputText id="GameDeveloper" class="form-control" @bind-Value="currentGame.GameDeveloper" />
+    </div>
+    <div class="form-group pb-2">
+        <label for="Publisher">Utgivare</label>
+        <InputText id="Publisher" class="form-control" @bind-Value="currentGame.Publisher" />
+    </div>
+    <div class="form-group pb-2">
+        <label for="Description">Beskrivning:</label>
+        <InputTextArea id="description" class="form-control" @bind-Value="currentGame.Description" />
+    </div>
+
+    <div class="form-group pb-2">
+        <label for="AgeRestriction">Åldersgräns:</label>
+        <InputNumber id="AgeRestriction" class="form-control" @bind-Value="currentGame.AgeRestriction" />
+    </div>
+    <div class="form-group pb-2">
+        <label for="ProductImageUrl">Omslagsbild:</label>
+        <InputFile class="form-control" />
+    </div>
+
+@*     <div class="form-group pb-2">
+        <label for="BackgroundImageUrl">Bakgrundsbild:</label>
+        <InputText id="backgroundImageUrl" class="form-control" @bind-Value="currentGame.BackgroundImageUrl" />
+    </div> *@
+    <div class="form-group pb-2">
+        <label for="NumberOfPlayers">Multiplayerläge:</label>
+        <InputText id="NumberOfPlayers" placeholder="Enspelare/Flerspelare" class="form-control" @bind-Value="currentGame.NumberOfPlayers" />
+    </div>
+    <div class="form-group pb-2">
+        <label for="Price">Pris:</label>
+        <InputNumber id="price" class="form-control" @bind-Value="currentGame.Price" />
+    </div>
+    <div class="form-group pb-2">
+        <label for="Platform">Platform:</label>
+        <InputText id="Platform" placeholder="Steam/EpicGames/Ubisoft" class="form-control" @bind-Value="currentGame.Platform" />
+    </div>
+    <div class="form-group pb-2">
+        <label for="VideoTrailer">Video:</label>
+        <InputText id="VideoTrailer" class="form-control" @bind-Value="currentGame.VideoTrailer" />
+    </div>
+    <div class="form-group pb-2">
+        <label for="SystemRequirement">Systemkrav:</label>
+        <InputText id="SystemRequirement" class="form-control" @bind-Value="currentGame.SystemRequirement" />
+    </div>
+    <div class="form-group pb-2">
+        <label for="OnlineFuntionality">Onlineläge:</label>
+        <InputText id="OnlineFuntionality" placeholder="Offline/Online" class="form-control" @bind-Value="currentGame.OnlineFuntionality" />
+    </div>
+
+    <div class="pb-2">
+        <button id="submitgamebutton" type="submit" class="btn btn-success">Uppdatera/Lägg till</button>
+        <button id="deletegamebutton" type="button" class="btn btn-danger" @onclick="@OnDelete">Ta bort</button>
+    </div>
+</EditForm>
+
+@code {
+    private GameResponse currentGame = new();
+    private List<GameResponse> Game = new();
+
+    private GenresResponse SelectedGenresType = new();
+    private List<GenresResponse> GenreTypes = new();
+
+    private DateTime DateTimeVariable = DateTime.Now;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        Game.AddRange(await GameService.GetAllGames());
+        GenreTypes.AddRange(await GenresService.GetAllGenres());
+        GenreTypes = GenreTypes.OrderBy(g => g.Name).ToList();
+    }
+
+    private async Task OnValidSubmit()
+    {
+        
+        currentGame.PublicationDate = DateTimeVariable;
+        if (currentGame.Id == Guid.Empty)
+        {
+            await GameService.AddGame(currentGame);
+        }
+        else
+        {
+            await GameService.UpdateGame(currentGame);
+        }
+
+        Game.Clear();
+        Game.AddRange(await GameService.GetAllGames());
+        currentGame = new GameResponse();
+    }
+
+    private async Task RemoveGenreToGame()
+    {
+            currentGame.Genre.RemoveAll(g => g.Id == SelectedGenresType.Id);
+    }
+
+    private async Task AddGenreToGame()
+    {
+            SelectedGenresType = GenreTypes.FirstOrDefault(e => e.Id == SelectedGenresType.Id);
+            var ItemInList = currentGame.Genre.FirstOrDefault(g => g == SelectedGenresType);
+            if (ItemInList is null)
+            {
+                currentGame.Genre.Add(SelectedGenresType);
+            }
+    }
+
+    private async Task OnDelete()
+    {
+        if (currentGame != null && currentGame.Id != Guid.Empty)
+        {
+            await GameService.RemoveGame(currentGame);
+        }
+
+        Game.Clear();
+        Game.AddRange(await GameService.GetAllGames());
+        currentGame = new GameResponse();
+    }
+
+    private async Task OnGameSelected(ChangeEventArgs e)
+    {
+        Guid.TryParse(e.Value?.ToString(), out Guid gameId);
+
+        if (gameId == Guid.Empty)
+        {
+            currentGame = new GameResponse();
+            SelectedGenresType = new();
+            DateTimeVariable = DateTime.Now;
+        }
+        else
+        {
+            currentGame = Game.FirstOrDefault(e => e.Id == gameId);
+            DateTimeVariable = currentGame.PublicationDate;
+        }
+    }
+
+    // private async Task UploadFile(InputFileChangeEventArgs e)
+    // {
+    //     var file = e.File;
+    //     if (file != null)
+    //     {
+    //         currentGame.ProductImageUrl = file.Name;
+
+    //         using (var stream = file.OpenReadStream())
+    //         {
+    //             await BlobStorageService.UploadFromStreamAsync(file.Name, stream);
+    //         }
+    //     }
+    // }
+
+
+}
+

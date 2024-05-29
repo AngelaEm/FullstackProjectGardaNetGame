@@ -1,0 +1,94 @@
+﻿@page "/Admin/Genres"
+@using GardaNetGame.Shared.DTOs.Genres.Response
+@using GardaNetGame.Shared.Interfaces
+@rendermode InteractiveServer
+@inject IGenreService<GenresResponse> GenreService
+
+<h3>Hantera Genrer</h3>
+
+<div class="pb-2">
+    <label class="form-label">Välj Genre:</label>
+    <select id="GenreChoiceDropdown" class="form-control" value="@currentGenre" @onchange="@OnGenreSelected">
+        <option value="addNew"></option>
+        @foreach (var genreItem in Genres)
+        {
+            <option value="@genreItem.Id">@genreItem.Name</option>
+        }
+    </select>
+</div>
+
+<EditForm Model="@currentGenre" OnValidSubmit="@OnValidSubmit" FormName="EducationForm">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group pb-3">
+        <label for="Name">Namn på Genre:</label>
+        <InputText id="Name" class="form-control" maxlength="30" @bind-Value="currentGenre.Name" />
+    </div>
+
+
+    <button id="submitgenrebutton" type="submit" class="btn btn-success">Uppdatera/Lägg till</button>
+    <button id="deletegenrebutton" type="button" class="btn btn-danger" @onclick="@OnDelete">Ta bort</button>
+
+</EditForm>
+
+@code {
+    
+    private GenresResponse currentGenre = new();
+    private List<GenresResponse> Genres = new();
+
+    private GenresResponse SelectedGenre = new();
+   
+
+    protected override async Task OnInitializedAsync()
+    {
+        Genres.AddRange(await GenreService.GetAllGenres());
+        Genres = Genres.OrderBy(g => g.Name).ToList();
+    }
+
+    private async Task OnValidSubmit()
+    {
+        
+        if (currentGenre.Id == Guid.Empty)
+        {
+            await GenreService.AddGenre(currentGenre);
+        }
+        else
+        {
+            await GenreService.UpdateGenre(currentGenre);
+        }
+
+        Genres.Clear();
+        Genres.AddRange(await GenreService.GetAllGenres());
+        Genres = Genres.OrderBy(g => g.Name).ToList();
+        currentGenre = new GenresResponse();
+    }
+
+    private async Task OnDelete()
+    {
+        if (currentGenre != null && currentGenre.Id != Guid.Empty)
+        {
+            await GenreService.RemoveGenre(currentGenre);
+        }
+
+        Genres.Clear();
+        Genres.AddRange(await GenreService.GetAllGenres());
+        Genres = Genres.OrderBy(g => g.Name).ToList();
+        currentGenre = new GenresResponse();
+    }
+
+    private async Task OnGenreSelected(ChangeEventArgs e)
+    {
+        Guid.TryParse(e.Value?.ToString(), out Guid genreId);
+
+        if (genreId == Guid.Empty)
+        {
+            currentGenre = new GenresResponse();
+            
+        }
+        else
+        {
+            currentGenre = Genres.FirstOrDefault(g => g.Id == genreId);
+        }
+    }
+}
