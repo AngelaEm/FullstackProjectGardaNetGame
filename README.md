@@ -4,6 +4,15 @@
 
 Detta projekt är en fullstack e-handelsplattform utvecklad som en gruppuppgift på en yrkeshögskola med ett halvårs erfarenhet om mjukvaruutveckling. Plattformen är byggd med .NET-ramverket och visar upp en mängd olika färdigheter, inklusive backend-utveckling, frontend-utveckling, databashantering och distribution. Målet med projektet var utöver att jobba agilt, tillämpa scrum och dela kunskaper inom teamet att skapa en fullt fungerande webshop där användare kan anmäla sig till event, bläddra bland produkter, lägga till dem i sin kundvagn och slutföra fiktiva köp.
 
+## Roller och Ansvar
+
+Projektet genomfördes i samarbete av tio studenter från fyra olika utbildningsprogram, där varje medlem använde sina unika kunskaper från respektive utbildning:
+
+- **IT-Projektledare**: Agerade produktägare och scrum-master för att facilitera och effektivisera processer.
+- **Mjukvarutestare**: Skrev och automatiserade flödestester för säkerställande av acceptanskrav och applikationsstabilitet.
+- **.NET-Cloudutvecklare**: Utveckling med fokus på integration och distribution, satte upp CI/CD-pipelines och Azure-hosting.
+- **.NET-Utvecklare**: Fullstack-utveckling med fokus på designmönster och struktur.
+
 ## Funktioner
 
 - **Användarautentisering**: Säker registrering och inloggning med ASP.NET Core Identity.
@@ -39,15 +48,6 @@ Detta projekt är en fullstack e-handelsplattform utvecklad som en gruppuppgift 
 - **Postman**: För API-testning och utveckling.
 - **Robot Framework**: Ett automatiseringsramverk för acceptans- och godkännande-testning.
 - **Selenium Library**: Ett verktyg för att automatisera webbläsare, använt tillsammans med Robot Framework för att utföra tester.
-
-## Roller och Ansvar
-
-Projektet genomfördes i samarbete av tio studenter från fyra olika utbildningsprogram, där varje medlem använde sina unika kunskaper från respektive utbildning:
-
-- **IT-Projektledare**: Agerade produktägare och scrum-master för att facilitera och effektivisera processer.
-- **Mjukvarutestare**: Skrev och automatiserade flödestester för säkerställande av acceptanskrav och applikationsstabilitet.
-- **.NET-Cloudutvecklare**: Utveckling med fokus på integration och distribution, satte upp CI/CD-pipelines och Azure-hosting.
-- **.NET-Utvecklare**: Fullstack-utveckling med fokus på designmönster och struktur.
 
 ## Planerade förbättringar
 
